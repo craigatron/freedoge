@@ -5,6 +5,8 @@ from faucet import dogecoin_client
 def template_constants(request):
   faucet_address = os.environ['FAUCET_ADDR']
   dictionary = {'FAUCET_ADDR': faucet_address}
+  if settings.ANALYTICS_ID:
+    dictionary['ANALYTICS_ID'] = settings.ANALYTICS_ID
   try:
     server = dogecoin_client.get_rpc_server()
     balance = server.getbalance(os.environ['DOGE_ACCOUNT'])

@@ -23,8 +23,11 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 DEBUG = 'DEBUG' in os.environ and os.environ['DEBUG'] == '1'
 TEMPLATE_DEBUG = DEBUG
+MAINTENANCE = 'MAINTENANCE' in os.environ and os.environ['MAINTENANCE'] == '1'
 
 ALLOWED_HOSTS = ['.herokuapp.com', '.freedoge.com']
+
+ANALYTICS_ID = os.environ.get('ANALYTICS_ID')
 
 # Application definition
 
@@ -46,6 +49,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'freedoge.middleware.MaintenanceMiddleware',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
