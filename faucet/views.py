@@ -11,6 +11,7 @@ from django.views.generic import View
 from faucet import dogecoin_client
 from faucet.models import Transaction
 
+DOGE_ACCOUNT = os.environ['DOGE_ACCOUNT']
 DOGE_AMOUNT = float(os.environ['DOGE_AMOUNT'])
 
 
@@ -38,7 +39,7 @@ class FreeDoge(View):
       is_valid = is_valid_resp['isvalid']
       if is_valid:
         dictionary['send_addr'] = send_addr
-        remaining_balance = server.getbalance()
+        remaining_balance = server.getbalance(DOGE_ACCOUNT)
         if remaining_balance and remaining_balance > DOGE_AMOUNT:
           send_resp = server.sendtoaddress(send_addr, DOGE_AMOUNT)
           if 'code' in send_resp:

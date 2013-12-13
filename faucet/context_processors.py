@@ -7,7 +7,7 @@ def template_constants(request):
   dictionary = {'FAUCET_ADDR': faucet_address}
   try:
     server = dogecoin_client.get_rpc_server()
-    balance = server.getbalance()
+    balance = server.getbalance(os.environ['DOGE_ACCOUNT'])
     total_received = server.getreceivedbyaddress(faucet_address)
     dictionary['balance'] = balance
     dictionary['given_out'] = total_received - balance
