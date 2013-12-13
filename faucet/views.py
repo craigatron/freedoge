@@ -1,26 +1,39 @@
+from datetime import datetime, timedelta
 import logging
 import os
 
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template import RequestContext
+from django.utils.timezone import utc
 from django.views.generic import View
-from jsonrpclib import Server
+from faucet import dogecoin_client
+from faucet.models import Transaction
 
-DOGE_AMOUNT = 0.01
+DOGE_AMOUNT = float(os.environ['DOGE_AMOUNT'])
 
 
 class FreeDoge(View):
   def get(self, request, *args, **kwargs):
-    return render(request, 'base.html',
-        dictionary={'faucet_addr': os.environ['FAUCET_ADDR']},
-        context_instance=RequestContext(request))
+    dictionary = {}
+    if not should_give_doge(request):
+      dictionary['error'] = 'naughty shibe already got doge'
+      dictionary['hide_input'] = True
+    return render(request, 'base.html', dictionary,
+                  context_instance=RequestContext(request))
 
   def post(self, request, *args, **kwargs):
-    dictionary={'faucet_addr': os.environ['FAUCET_ADDR']}
+    send_addr = request.POST.get('addr', '')
+    if not should_give_doge(request, send_addr):
+      return render(request, 'base.html',
+          {'error': 'naughty shibe already got doge',
+           'hide_input': True},
+          context_instance=RequestContext(request))
+
+    dictionary = {}
     try:
-      server = get_rpc_server()
-      send_addr = request.POST.get('addr', '')
+      server = dogecoin_client.get_rpc_server()
       is_valid_resp = server.validateaddress(send_addr)
       is_valid = is_valid_resp['isvalid']
       if is_valid:
@@ -31,7 +44,13 @@ class FreeDoge(View):
           if 'code' in send_resp:
             dictionary['error'] = send_resp['message']
           else:
+            tx = Transaction(ip_address=get_ip(request),
+                             sent_address=send_addr,
+                             tx_time=datetime.utcnow().replace(tzinfo=utc))
+            tx.save()
             dictionary['transaction'] = send_resp
+        else:
+          dictionary['error'] = 'not enough doge left to send :('
       else:
         dictionary['error'] = 'invalid address!'
     except Exception as e:
@@ -41,8 +60,22 @@ class FreeDoge(View):
         context_instance=RequestContext(request))
 
 
-def get_rpc_server():
-  url = 'http://%s:%s@%s' % (os.environ['DOGEUSER'],
-                             os.environ['DOGEPASS'],
-                             os.environ['DOGESERVER'])
-  return Server(url)
+def get_ip(request):
+  x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+  if x_forwarded_for:
+    ip = x_forwarded_for.split(',')[0]
+  else:
+    ip = request.META.get('REMOTE_ADDR')
+  return ip
+
+
+def should_give_doge(request, send_addr=None):
+  ip = get_ip(request)
+  week_ago = datetime.utcnow().replace(tzinfo=utc) - timedelta(days=7)
+  logging.warning('ip: ' + ip)
+  logging.warning('last week: ' + str(week_ago))
+  query = Q(ip_address=ip)
+  if send_addr:
+    query = query | Q(sent_address=send_addr)
+  transactions = Transaction.objects.filter(query).filter(tx_time__gt=week_ago)
+  return len(transactions) == 0

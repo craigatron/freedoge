@@ -11,6 +11,10 @@
   color: red;
 }
 
+.green {
+  color: green;
+}
+
 input[name=addr] {
   width: 350px;
 }
