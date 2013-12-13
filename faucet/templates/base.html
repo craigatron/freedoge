@@ -6,7 +6,20 @@
   </head>
   <body>
     <div id="content">
+      <h1>FREE DOGE!!!</h1>
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
       <img src="/static/dogecoin.png" class="dogecoin" />
+      {% if not error and send_addr %}
+        <p>Sent to {{ send_addr }}</p>
+      {% else %}
+        <form method="post">
+          {% csrf_token %}
+          <input type="text" name="addr">
+          <button type="submit">get doge!</button>
+        </form>
+      {% endif %}
       <p>Refill faucet!  Donate: {{ faucet_addr }}</p>
     </div>
   </body>

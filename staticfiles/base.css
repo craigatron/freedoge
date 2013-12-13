@@ -1,8 +1,19 @@
+* {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
 #content {
   width: 100%;
   text-align: center;
 }
 
+.error {
+  color: red;
+}
+
+input[name=addr] {
+  width: 350px;
+}
 
 @-moz-keyframes rotate {
   from {-moz-transform: rotate(0deg);}
