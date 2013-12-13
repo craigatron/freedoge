@@ -19,6 +19,10 @@ input[name=addr] {
   width: 350px;
 }
 
+ins.adsbygoogle {
+  margin-top: 10px;
+}
+
 @-moz-keyframes rotate {
   from {-moz-transform: rotate(0deg);}
   to {-moz-transform: rotate(360deg);}
