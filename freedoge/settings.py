@@ -24,7 +24,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = 'DEBUG' in os.environ and os.environ['DEBUG'] == '1'
 TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = ['freedoge.herokuapp.com', '.freedoge.com']
+ALLOWED_HOSTS = ['.herokuapp.com', '.freedoge.com']
 
 # Application definition
 
