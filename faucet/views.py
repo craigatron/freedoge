@@ -19,7 +19,7 @@ class FreeDoge(View):
   def get(self, request, *args, **kwargs):
     dictionary = {}
     if not should_give_doge(request):
-      dictionary['error'] = 'naughty shibe already got doge'
+      dictionary['error'] = 'naughty shibe already got doge, can get more doge in 1 week'
       dictionary['hide_input'] = True
     return render(request, 'base.html', dictionary,
                   context_instance=RequestContext(request))
@@ -28,7 +28,7 @@ class FreeDoge(View):
     send_addr = request.POST.get('addr', '')
     if not should_give_doge(request, send_addr):
       return render(request, 'base.html',
-          {'error': 'naughty shibe already got doge',
+          {'error': 'naughty shibe already got doge, can get more doge in 1 week',
            'hide_input': True},
           context_instance=RequestContext(request))
 
