@@ -1,5 +1,7 @@
 import logging
 import os
+
+from django.conf import settings
 from faucet import dogecoin_client
 
 def template_constants(request):
