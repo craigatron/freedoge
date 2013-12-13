@@ -39,9 +39,9 @@ class FreeDoge(View):
       is_valid = is_valid_resp['isvalid']
       if is_valid:
         dictionary['send_addr'] = send_addr
-        remaining_balance = server.getbalance(DOGE_ACCOUNT, 0)
+        remaining_balance = server.getbalance(DOGE_ACCOUNT)
         if remaining_balance and remaining_balance > DOGE_AMOUNT:
-          send_resp = server.sendtoaddress(send_addr, DOGE_AMOUNT)
+          send_resp = server.sendfrom(DOGE_ACCOUNT, send_addr, DOGE_AMOUNT)
           if 'code' in send_resp:
             dictionary['error'] = send_resp['message']
           else:
