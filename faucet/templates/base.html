@@ -32,11 +32,26 @@
       {% if not error and send_addr %}
         <p>Sent to {{ send_addr }}: <a href="http://dogechain.info/tx/{{ transaction }}" target="_blank">transaction</a></p>
       {% elif not hide_input and balance > 0 %}
-        <form method="post">
-          {% csrf_token %}
-          <input type="text" name="addr">
-          <button type="submit">get doge!</button>
-        </form>
+        <div id="input-form">
+          <form method="post">
+            {% csrf_token %}
+            <div class="form-line">
+              <label for="addr">address:</label><input type="text" name="addr">
+            </div>
+            <div class="form-line">
+              <script type="text/javascript" src="http://api.recaptcha.net/challenge?k=6Lckz-sSAAAAAHrB6fBm4EckGaLE2jzWY5bE4zWf"></script>
+              <noscript>
+                <iframe src="http://api.recaptcha.net/noscript?k=6Lckz-sSAAAAAHrB6fBm4EckGaLE2jzWY5bE4zWf" height="300" width="500" frameborder="0"></iframe><br>
+                <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+                </textarea>
+                <input type="hidden" name="recaptcha_response_field" value="manual_challenge">
+              </noscript>
+            </div>
+            <div class="form-line">
+              <button type="submit">get doge!</button>
+            </div>
+          </form>
+        </div>
       {% endif %}
       <p>Refill faucet!  Donate: {{ FAUCET_ADDR }}</p>
       

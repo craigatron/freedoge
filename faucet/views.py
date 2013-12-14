@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 import logging
 import os
 
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_ipv4_address
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -10,6 +12,7 @@ from django.utils.timezone import utc
 from django.views.generic import View
 from faucet import dogecoin_client
 from faucet.models import Transaction
+from recaptcha.client import captcha
 
 DOGE_ACCOUNT = os.environ['DOGE_ACCOUNT']
 DOGE_AMOUNT = float(os.environ['DOGE_AMOUNT'])
@@ -18,18 +21,36 @@ DOGE_AMOUNT = float(os.environ['DOGE_AMOUNT'])
 class FreeDoge(View):
   def get(self, request, *args, **kwargs):
     dictionary = {}
-    if not should_give_doge(request):
-      dictionary['error'] = 'naughty shibe already got doge, can get more doge in 1 week'
-      dictionary['hide_input'] = True
+    try:
+      if not should_give_doge(request):
+        dictionary['error'] = 'naughty shibe already got doge, can get more doge in 1 week'
+        dictionary['hide_input'] = True
+    except ValidationError as e:
+      logging.warning(str(e))
+      dictionary['error'] = 'naughty shibe, that\'s not a real IP address'
     return render(request, 'base.html', dictionary,
                   context_instance=RequestContext(request))
 
   def post(self, request, *args, **kwargs):
     send_addr = request.POST.get('addr', '')
-    if not should_give_doge(request, send_addr):
+    captcha_response = captcha.submit(
+        request.POST.get('recaptcha_challenge_field'),
+        request.POST.get('recaptcha_response_field'),
+        os.environ['CAPTCHA_SECRET_KEY'],
+        request.META['REMOTE_ADDR'])
+    if not captcha_response.is_valid:
       return render(request, 'base.html',
-          {'error': 'naughty shibe already got doge, can get more doge in 1 week',
-           'hide_input': True},
+          {'error':   'bad captcha!'},
+          context_instance=RequestContext(request))
+    try:
+      if not should_give_doge(request, send_addr):
+        return render(request, 'base.html',
+            {'error': 'naughty shibe already got doge, can get more doge in 1 week',
+             'hide_input': True},
+            context_instance=RequestContext(request))
+    except ValidationError as e:
+      return render(request, 'base.html',
+          {'error': 'naughty shibe, that\'s not a real IP address'},
           context_instance=RequestContext(request))
 
     dictionary = {}
@@ -41,13 +62,13 @@ class FreeDoge(View):
         dictionary['send_addr'] = send_addr
         remaining_balance = server.getbalance(DOGE_ACCOUNT)
         if remaining_balance and remaining_balance > DOGE_AMOUNT:
+          tx = Transaction(ip_address=get_ip(request),
+                           sent_address=send_addr,
+                           tx_time=datetime.utcnow().replace(tzinfo=utc))
           send_resp = server.sendfrom(DOGE_ACCOUNT, send_addr, DOGE_AMOUNT)
           if 'code' in send_resp:
             dictionary['error'] = send_resp['message']
           else:
-            tx = Transaction(ip_address=get_ip(request),
-                             sent_address=send_addr,
-                             tx_time=datetime.utcnow().replace(tzinfo=utc))
             tx.save()
             dictionary['transaction'] = send_resp
         else:
@@ -72,9 +93,8 @@ def get_ip(request):
 
 def should_give_doge(request, send_addr=None):
   ip = get_ip(request)
+  validate_ipv4_address(ip)
   week_ago = datetime.utcnow().replace(tzinfo=utc) - timedelta(days=7)
-  logging.warning('ip: ' + ip)
-  logging.warning('last week: ' + str(week_ago))
   query = Q(ip_address=ip)
   if send_addr:
     query = query | Q(sent_address=send_addr)

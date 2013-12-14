@@ -15,12 +15,26 @@
   color: green;
 }
 
+label {
+  margin-right: 5px;
+}
+
 input[name=addr] {
-  width: 350px;
+  width: 400px;
 }
 
 ins.adsbygoogle {
   margin-top: 10px;
+}
+
+#recaptcha_area {
+  margin: 0 auto;
+}
+
+.form-line {
+  display: inline-block;
+  width: 100%;
+  margin: 10px 0;
 }
 
 @-moz-keyframes rotate {
