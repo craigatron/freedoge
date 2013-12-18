@@ -87,7 +87,7 @@ def get_ip(request):
   x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
   if x_forwarded_for:
     logging.info('xforwadedfor: %s', x_forwarded_for)
-    ip = x_forwarded_for.split(',')[-1]
+    ip = x_forwarded_for.split(',')[-1].trim()
   else:
     ip = request.META.get('REMOTE_ADDR')
   return ip
