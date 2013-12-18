@@ -1,8 +1,8 @@
 import os
-from jsonrpclib import Server
+from bitcoinrpc.authproxy import AuthServiceProxy
 
 def get_rpc_server():
   url = 'http://%s:%s@%s' % (os.environ['DOGEUSER'],
                              os.environ['DOGEPASS'],
                              os.environ['DOGESERVER'])
-  return Server(url)
+  return AuthServiceProxy(url)
