@@ -12,14 +12,15 @@ from django.utils.timezone import utc
 from django.views.generic import View
 from faucet import dogecoin_client
 from faucet.models import Transaction
+from ratelimit.decorators import ratelimit
 from recaptcha.client import captcha
 
 DOGE_ACCOUNT = os.environ['DOGE_ACCOUNT']
 DOGE_AMOUNT = float(os.environ['DOGE_AMOUNT'])
 
-
-class FreeDoge(View):
-  def get(self, request, *args, **kwargs):
+@ratelimit(block=True, method='POST')
+def freedoge(request):
+  if request.method == 'GET':
     dictionary = {}
     try:
       if not should_give_doge(request):
@@ -31,7 +32,7 @@ class FreeDoge(View):
     return render(request, 'base.html', dictionary,
                   context_instance=RequestContext(request))
 
-  def post(self, request, *args, **kwargs):
+  elif request.method == 'POST':
     send_addr = request.POST.get('addr', '')
     captcha_response = captcha.submit(
         request.POST.get('recaptcha_challenge_field'),
