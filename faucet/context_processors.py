@@ -4,6 +4,8 @@ import os
 from django.conf import settings
 from faucet import dogecoin_client
 
+DOGE_AMOUNT = float(os.environ['DOGE_AMOUNT'])
+
 def template_constants(request):
   faucet_address = os.environ['FAUCET_ADDR']
   dictionary = {'FAUCET_ADDR': faucet_address}
@@ -15,6 +17,7 @@ def template_constants(request):
     total_received = server.getreceivedbyaddress(faucet_address)
     dictionary['balance'] = balance
     dictionary['given_out'] = total_received - balance
+    dictionary['give_amount'] = DOGE_AMOUNT
   except Exception as e:
     logging.error('dogecoin client error: ' + str(e))
     dictionary['error'] = 'couldn\'t connect to dogecoin :('

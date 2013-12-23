@@ -26,12 +26,13 @@
       <img src="/static/dogecoin.png" class="dogecoin" />
       {% if balance %}
         <p>wow <span class="green">{{ balance }}</span> dogecoins left</p>
-      {% elif balance == 0 %}
-        <p class="error">no doge left in faucet :(</p>
+      {% endif %}
+      {% if balance < give_amount %}
+        <p class="error">not enough doge left in faucet :(</p>
       {% endif %}
       {% if not error and send_addr %}
         <p>Sent to {{ send_addr }}: <a href="http://dogechain.info/tx/{{ transaction }}" target="_blank">transaction</a></p>
-      {% elif not hide_input and balance > 0 %}
+      {% elif not hide_input and balance >= give_amount %}
         <div id="input-form">
           <form method="post">
             {% csrf_token %}
