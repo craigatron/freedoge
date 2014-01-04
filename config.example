@@ -23,3 +23,7 @@ These are optional environment variables.
 MAINTENANCE=0
 # ID of the Google Analytics account to use for tracking visits.
 ANALYTICS_ID=<ID>
+# Your adsense client ID for the bottom ad.
+ADSENSE_CLIENT=ca-pub-*************
+# Your adsense slot ID for the bottom ad.
+ADSENSE_SLOT=***********
