@@ -1,0 +1,25 @@
+These environment variables MUST exist for this faucet to operate properly.
+
+# Should always be 0 in production.
+DEBUG=0
+# Django secret key, generate something long and secure!
+SECRET_KEY=<secret key>
+# The rpcuser of your dogecoind instance
+DOGEUSER=dogeuser
+# The rpcpassword of your dogecoind instance
+DOGEPASS=dogepass
+# The URL of your dogecoind instance
+DOGESERVER=http://dogecoind.com:22555
+# The dogecoin account to use.  Blank string is the default account.
+DOGE_ACCOUNT=""
+# The amount of dogecoin to give per request.  Note that dust transactions now have a high fee applied, so should probably be at least 2 or 3 Doge.
+DOGE_AMOUNT=3
+# The Dogecoin address backing your faucet's wallet.
+FAUCET_ADDR=D****************************
+
+These are optional environment variables.
+
+# When MAINTENANCE=1, a maintenance message is displayed on every request.
+MAINTENANCE=0
+# ID of the Google Analytics account to use for tracking visits.
+ANALYTICS_ID=<ID>
