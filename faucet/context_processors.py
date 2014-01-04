@@ -11,6 +11,11 @@ def template_constants(request):
   dictionary = {'FAUCET_ADDR': faucet_address}
   if settings.ANALYTICS_ID:
     dictionary['ANALYTICS_ID'] = settings.ANALYTICS_ID
+
+  if 'ADSENSE_CLIENT' in os.environ and 'ADSENSE_SLOT' in os.environ:
+    dictionary['ADSENSE_CLIENT'] = os.environ['ADSENSE_CLIENT']
+    dictionary['ADSENSE_SLOT'] = os.environ['ADSENSE_SLOT']
+
   try:
     server = dogecoin_client.get_rpc_server()
     balance = server.getbalance(os.environ['DOGE_ACCOUNT'])
