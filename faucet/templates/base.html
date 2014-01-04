@@ -57,15 +57,17 @@
       <p>Refill faucet!  Donate: {{ FAUCET_ADDR }}</p>
       <p><a href="https://github.com/craigatron/freedoge" target="_blank">wow so source</a></p>
       
-      <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-      <!-- faucet -->
-      <ins class="adsbygoogle"
-          style="display:inline-block;width:728px;height:90px"
-          data-ad-client="ca-pub-8314080759163668"
-          data-ad-slot="4853128648"></ins>
-      <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
+      {% if ADSENSE_CLIENT and ADSENSE_SLOT %}
+        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!-- faucet -->
+        <ins class="adsbygoogle"
+            style="display:inline-block;width:728px;height:90px"
+            data-ad-client="ca-pub-8314080759163668"
+            data-ad-slot="4853128648"></ins>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      {% endif %}
     </div>
   </body>
 </html>
